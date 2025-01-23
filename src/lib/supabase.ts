@@ -31,6 +31,7 @@ export async function retryOperation<T>(
       return await operation();
     } catch (error) {
       lastError = error;
+      console.error(`Attempt ${i + 1} failed:`, error);
       if (i < maxRetries - 1) {
         await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
         continue;
