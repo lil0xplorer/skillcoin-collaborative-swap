@@ -156,20 +156,38 @@ export class DAOContract {
     const endTime = Math.floor(Date.now() / 1000) + (durationInDays * 24 * 60 * 60);
     const fee = ethers.parseEther("0.01"); // 0.01 ETH fee
     
-    const tx = await this.contract.createProposal(title, description, endTime, {
-      value: fee
-    });
-    return tx.wait();
+    try {
+      const tx = await this.contract.createProposal(title, description, endTime, {
+        value: fee
+      });
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (error) {
+      console.error('Error creating proposal:', error);
+      throw error;
+    }
   }
 
   async vote(proposalId: number, support: boolean) {
-    const tx = await this.contract.vote(proposalId, support);
-    return tx.wait();
+    try {
+      const tx = await this.contract.vote(proposalId, support);
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (error) {
+      console.error('Error voting:', error);
+      throw error;
+    }
   }
 
   async executeProposal(proposalId: number) {
-    const tx = await this.contract.executeProposal(proposalId);
-    return tx.wait();
+    try {
+      const tx = await this.contract.executeProposal(proposalId);
+      const receipt = await tx.wait();
+      return receipt;
+    } catch (error) {
+      console.error('Error executing proposal:', error);
+      throw error;
+    }
   }
 
   async getProposal(proposalId: number) {

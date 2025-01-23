@@ -6,9 +6,9 @@ interface ProposalCardProps {
   id: string;
   title: string;
   description: string;
-  creator_address?: string; // Made optional
-  start_time?: string; // Changed to string
-  end_time?: string; // Changed to string
+  creator_address?: string;
+  start_time?: string;
+  end_time?: string;
   yes_votes?: number;
   no_votes?: number;
   status?: string;
@@ -20,7 +20,7 @@ export default function ProposalCard({
   id,
   title,
   description,
-  creator_address = '', // Default value
+  creator_address = '',
   start_time = new Date().toISOString(),
   end_time = new Date().toISOString(),
   yes_votes = 0,
@@ -30,8 +30,8 @@ export default function ProposalCard({
   onExecute,
 }: ProposalCardProps) {
   const totalVotes = (yes_votes || 0) + (no_votes || 0);
-  const yesPercentage = totalVotes > 0 ? ((yes_votes || 0) / totalVotes) * 100 : 0;
-  const noPercentage = totalVotes > 0 ? ((no_votes || 0) / totalVotes) * 100 : 0;
+  const yesPercentage = totalVotes > 0 ? Math.round(((yes_votes || 0) / totalVotes) * 100) : 0;
+  const noPercentage = totalVotes > 0 ? Math.round(((no_votes || 0) / totalVotes) * 100) : 0;
   const isActive = status === 'active';
   const hasEnded = new Date() > new Date(end_time);
 
@@ -45,7 +45,11 @@ export default function ProposalCard({
       await onVote(id, support);
       toast.success(`Vote cast successfully!`);
     } catch (error) {
-      toast.error('Failed to cast vote');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to cast vote');
+      }
       console.error('Vote error:', error);
     }
   };
@@ -55,7 +59,11 @@ export default function ProposalCard({
       await onExecute(id);
       toast.success('Proposal executed successfully!');
     } catch (error) {
-      toast.error('Failed to execute proposal');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to execute proposal');
+      }
       console.error('Execute error:', error);
     }
   };
@@ -95,7 +103,7 @@ export default function ProposalCard({
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Yes ({Math.round(yesPercentage)}%)</span>
+              <span>Yes ({yesPercentage}%)</span>
               <span>{yes_votes} votes</span>
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -108,7 +116,7 @@ export default function ProposalCard({
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>No ({Math.round(noPercentage)}%)</span>
+              <span>No ({noPercentage}%)</span>
               <span>{no_votes} votes</span>
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
