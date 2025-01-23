@@ -172,25 +172,59 @@ function App() {
 
     try {
       const daoContract = new DAOContract(signer);
-      const tx = await daoContract.vote(parseInt(proposalId), support);
-      await tx.wait();
-
-      const { error } = await supabase
-        .from('votes')
-        .insert([{
-          proposal_id: proposalId,
-          voter_address: await signer.getAddress(),
-          vote_type: support ? 'yes' : 'no',
-          vote_amount: 1
-        }]);
-
-      if (error) throw error;
       
-      loadProposals();
-      toast.success('Vote cast successfully!');
+      // First attempt the blockchain transaction
+      const tx = await daoContract.vote(parseInt(proposalId), support);
+      
+      // Wait for transaction confirmation
+      const receipt = await tx.wait();
+      
+      if (receipt.status === 1) { // Transaction successful
+        // Now update the database
+        const voterAddress = await signer.getAddress();
+        
+        const { error: voteError } = await supabase
+          .from('votes')
+          .insert([{
+            proposal_id: proposalId,
+            voter_address: voterAddress,
+            support: support,
+          }]);
+
+        if (voteError) {
+          console.error('Database error:', voteError);
+          // Even if database update fails, the blockchain vote was successful
+          toast.success('Vote recorded on blockchain, but database update failed');
+          return;
+        }
+
+        // Update the vote counts in the proposals table
+        const { error: updateError } = await supabase
+          .from('proposals')
+          .update({
+            yes_votes: support ? supabase.sql`yes_votes + 1` : supabase.sql`yes_votes`,
+            no_votes: support ? supabase.sql`no_votes` : supabase.sql`no_votes + 1`
+          })
+          .eq('id', proposalId);
+
+        if (updateError) {
+          console.error('Error updating vote counts:', updateError);
+        }
+
+        await loadProposals(); // Refresh the proposals list
+        toast.success('Vote cast successfully!');
+      }
     } catch (error) {
       console.error('Error voting:', error);
-      toast.error('Failed to cast vote');
+      if (error instanceof Error) {
+        if (error.message.includes('Already voted')) {
+          toast.error('You have already voted on this proposal');
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error('Failed to cast vote');
+      }
     }
   };
 
