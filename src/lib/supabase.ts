@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -15,10 +15,15 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   db: {
     schema: 'public'
+  },
+  global: {
+    headers: {
+      'Content-Type': 'application/json'
+    }
   }
 });
 
-// Helper function to retry failed requests
+// Helper function to retry failed requests with exponential backoff
 export async function retryOperation<T>(
   operation: () => Promise<T>,
   maxRetries = 3,
@@ -32,8 +37,16 @@ export async function retryOperation<T>(
     } catch (error) {
       lastError = error;
       console.error(`Attempt ${i + 1} failed:`, error);
+      
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.log('Network error detected, retrying...');
+      }
+      
       if (i < maxRetries - 1) {
-        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+        const backoffDelay = delay * Math.pow(2, i);
+        console.log(`Retrying in ${backoffDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
         continue;
       }
     }
