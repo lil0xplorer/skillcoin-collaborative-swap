@@ -198,14 +198,11 @@ function App() {
           return;
         }
 
-        // Update the vote counts in the proposals table
-        const { error: updateError } = await supabase
-          .from('proposals')
-          .update({
-            yes_votes: support ? supabase.sql`yes_votes + 1` : supabase.sql`yes_votes`,
-            no_votes: support ? supabase.sql`no_votes` : supabase.sql`no_votes + 1`
-          })
-          .eq('id', proposalId);
+        // Update the vote counts using a raw SQL update
+        const { error: updateError } = await supabase.rpc(
+          support ? 'increment_yes_votes' : 'increment_no_votes',
+          { proposal_id: proposalId }
+        );
 
         if (updateError) {
           console.error('Error updating vote counts:', updateError);
