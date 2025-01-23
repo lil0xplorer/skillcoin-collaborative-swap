@@ -38,9 +38,13 @@ export async function retryOperation<T>(
       lastError = error;
       console.error(`Attempt ${i + 1} failed:`, error);
       
-      // Check if it's a network error
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        console.log('Network error detected, retrying...');
+      if (error instanceof Error) {
+        // Log specific error details
+        console.error('Error details:', {
+          message: error.message,
+          name: error.name,
+          stack: error.stack
+        });
       }
       
       if (i < maxRetries - 1) {
