@@ -173,8 +173,14 @@ function App() {
     try {
       const daoContract = new DAOContract(signer);
       
+      // Convert string ID to number and ensure it's valid
+      const numericProposalId = parseInt(proposalId);
+      if (isNaN(numericProposalId)) {
+        throw new Error('Invalid proposal ID');
+      }
+      
       // First attempt the blockchain transaction
-      const tx = await daoContract.vote(parseInt(proposalId), support);
+      const tx = await daoContract.vote(numericProposalId, support);
       
       // Wait for transaction confirmation
       const receipt = await tx.wait();
@@ -198,7 +204,7 @@ function App() {
           return;
         }
 
-        // Update the vote counts using a raw SQL update
+        // Update the vote counts using stored procedures
         const { error: updateError } = await supabase.rpc(
           support ? 'increment_yes_votes' : 'increment_no_votes',
           { proposal_id: proposalId }
@@ -216,6 +222,8 @@ function App() {
       if (error instanceof Error) {
         if (error.message.includes('Already voted')) {
           toast.error('You have already voted on this proposal');
+        } else if (error.message.includes('Voting period ended')) {
+          toast.error('Voting period has ended');
         } else {
           toast.error(error.message);
         }
