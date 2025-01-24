@@ -48,12 +48,20 @@ export default function ProposalCard({
         return;
       }
 
+      if (!window.ethereum) {
+        toast.error('Please install MetaMask to vote');
+        return;
+      }
+
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const voterAddress = accounts[0];
+
       // Check if user has already voted using maybeSingle()
       const { data: existingVote, error: voteCheckError } = await supabase
         .from('votes')
         .select('*')
         .eq('proposal_id', id)
-        .eq('voter_address', await window.ethereum.request({ method: 'eth_requestAccounts' }).then(accounts => accounts[0]))
+        .eq('voter_address', voterAddress)
         .maybeSingle();
 
       if (voteCheckError) {
