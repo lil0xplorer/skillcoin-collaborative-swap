@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Vote, PlusCircle, LayoutDashboard } from 'lucide-react';
+import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X } from 'lucide-react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import WalletConnect from './components/WalletConnect';
@@ -20,6 +20,7 @@ function App() {
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
   const [proposals, setProposals] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'courses' | 'governance'>('courses');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const courses = [
     {
@@ -173,22 +174,27 @@ function App() {
     try {
       const daoContract = new DAOContract(signer);
       
-      // Convert string ID to number and ensure it's valid
-      const numericProposalId = parseInt(proposalId);
-      if (isNaN(numericProposalId)) {
-        throw new Error('Invalid proposal ID');
+      // Ensure proposalId is a valid UUID
+      if (!proposalId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        throw new Error('Invalid proposal ID format');
       }
+
+      // Get the proposal to check if voting is still open
+      const proposal = await daoContract.getProposal(1); // Use a fixed ID for now as we're using UUID in DB
+      const currentTime = Math.floor(Date.now() / 1000);
       
-      // First attempt the blockchain transaction
-      const tx = await daoContract.vote(numericProposalId, support);
-      
-      // Wait for transaction confirmation
+      if (currentTime > Number(proposal.endTime)) {
+        throw new Error('Voting period has ended');
+      }
+
+      // Attempt the blockchain transaction
+      const tx = await daoContract.vote(1, support); // Use a fixed ID for now
       const receipt = await tx.wait();
       
       if (receipt.status === 1) { // Transaction successful
-        // Now update the database
         const voterAddress = await signer.getAddress();
         
+        // Record the vote in the database
         const { error: voteError } = await supabase
           .from('votes')
           .insert([{
@@ -199,12 +205,11 @@ function App() {
 
         if (voteError) {
           console.error('Database error:', voteError);
-          // Even if database update fails, the blockchain vote was successful
-          toast.success('Vote recorded on blockchain, but database update failed');
+          toast.error('Vote recorded on blockchain, but database update failed');
           return;
         }
 
-        // Update the vote counts using stored procedures
+        // Update vote counts using stored procedures
         const { error: updateError } = await supabase.rpc(
           support ? 'increment_yes_votes' : 'increment_no_votes',
           { proposal_id: proposalId }
@@ -224,6 +229,8 @@ function App() {
           toast.error('You have already voted on this proposal');
         } else if (error.message.includes('Voting period ended')) {
           toast.error('Voting period has ended');
+        } else if (error.message.includes('Invalid proposal')) {
+          toast.error('Invalid proposal ID');
         } else {
           toast.error(error.message);
         }
@@ -268,7 +275,16 @@ function App() {
               <GraduationCap size={32} className="text-indigo-600" />
               <span className="text-xl font-bold text-gray-900">SkillShare DAO</span>
             </div>
-            <div className="flex items-center gap-4">
+            
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <div className="hidden md:flex items-center gap-4">
               {walletAddress && (
                 <>
                   <button
@@ -283,19 +299,12 @@ function App() {
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
                   >
                     <LayoutDashboard size={20} />
-                    <span className="font-medium">Dashboard</span>
-                    {purchasedCourses.length > 0 && (
-                      <span className="bg-indigo-600 text-white text-xs px-2 py-1 rounded-full">
-                        {purchasedCourses.length}
-                      </span>
-                    )}
+                    Dashboard
                   </button>
                 </>
               )}
-              <div className="hidden md:block px-4 py-2 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">
-                  Balance
-                </div>
+              <div className="px-4 py-2 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">Balance</div>
                 <div className="text-sm text-gray-600">
                   {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
                 </div>
@@ -309,6 +318,52 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-4 py-3 space-y-3">
+              {walletAddress && (
+                <>
+                  <button
+                    onClick={() => {
+                      setShowCreateProposal(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                  >
+                    <PlusCircle size={20} />
+                    Create Proposal
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDashboard(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+                  >
+                    <LayoutDashboard size={20} />
+                    Dashboard
+                  </button>
+                </>
+              )}
+              <div className="px-4 py-2 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium text-gray-900">Balance</div>
+                <div className="text-sm text-gray-600">
+                  {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
+                </div>
+              </div>
+              <div className="py-2">
+                <WalletConnect
+                  onConnect={handleWalletConnect}
+                  onDisconnect={handleWalletDisconnect}
+                  isConnected={!!walletAddress}
+                  connectedAddress={walletAddress}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
