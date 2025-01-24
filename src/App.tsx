@@ -388,6 +388,40 @@ function App() {
         {/* Main Content */}
         <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Add Tab Switcher */}
+            <div className="flex justify-center mb-8">
+              <div className={`inline-flex rounded-lg p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <button
+                  onClick={() => setActiveTab('courses')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'courses'
+                      ? isDarkMode
+                        ? 'bg-gray-600 text-white'
+                        : 'bg-white text-gray-900 shadow'
+                      : isDarkMode
+                        ? 'text-gray-300 hover:text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Courses
+                </button>
+                <button
+                  onClick={() => setActiveTab('governance')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'governance'
+                      ? isDarkMode
+                        ? 'bg-gray-600 text-white'
+                        : 'bg-white text-gray-900 shadow'
+                      : isDarkMode
+                        ? 'text-gray-300 hover:text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Governance
+                </button>
+              </div>
+            </div>
+
             {activeTab === 'courses' ? (
               <>
                 <div className="text-center mb-12">
