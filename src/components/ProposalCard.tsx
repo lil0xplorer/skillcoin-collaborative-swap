@@ -42,11 +42,22 @@ export default function ProposalCard({
 
   const handleVote = async (support: boolean) => {
     try {
+      if (hasEnded) {
+        toast.error('Voting period has ended for this proposal');
+        return;
+      }
+      
       await onVote(id, support);
       toast.success(`Vote cast successfully!`);
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message);
+        if (error.message.includes('Voting period ended')) {
+          toast.error('Voting period has ended for this proposal');
+        } else if (error.message.includes('Already voted')) {
+          toast.error('You have already voted on this proposal');
+        } else {
+          toast.error(error.message);
+        }
       } else {
         toast.error('Failed to cast vote');
       }
@@ -56,6 +67,11 @@ export default function ProposalCard({
 
   const handleExecute = async () => {
     try {
+      if (!hasEnded) {
+        toast.error('Cannot execute proposal before voting period ends');
+        return;
+      }
+      
       await onExecute(id);
       toast.success('Proposal executed successfully!');
     } catch (error) {
@@ -93,7 +109,9 @@ export default function ProposalCard({
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <Clock size={16} />
-              <span>Ends {new Date(end_time).toLocaleDateString()}</span>
+              <span>
+                {hasEnded ? 'Ended' : 'Ends'} {new Date(end_time).toLocaleDateString()}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Users size={16} />
@@ -108,7 +126,7 @@ export default function ProposalCard({
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-green-500 transition-all duration-500"
+                className="h-full bg-green-500 transition-all duration-500 ease-in-out"
                 style={{ width: `${yesPercentage}%` }}
               />
             </div>
@@ -121,7 +139,7 @@ export default function ProposalCard({
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-red-500 transition-all duration-500"
+                className="h-full bg-red-500 transition-all duration-500 ease-in-out"
                 style={{ width: `${noPercentage}%` }}
               />
             </div>
