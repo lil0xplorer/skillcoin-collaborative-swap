@@ -56,21 +56,21 @@ export default function ProposalCard({
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
       const voterAddress = accounts[0];
 
-      // Check if user has already voted using maybeSingle()
-      const { data: existingVote, error: voteCheckError } = await supabase
+      // First check if the user has already voted
+      const { data: votes, error: votesError } = await supabase
         .from('votes')
         .select('*')
         .eq('proposal_id', id)
-        .eq('voter_address', voterAddress)
-        .maybeSingle();
+        .eq('voter_address', voterAddress);
 
-      if (voteCheckError) {
-        console.error('Error checking vote:', voteCheckError);
+      if (votesError) {
+        console.error('Error checking votes:', votesError);
         toast.error('Error checking vote status');
         return;
       }
 
-      if (existingVote) {
+      // Check if any votes exist for this user
+      if (votes && votes.length > 0) {
         toast.error('You have already voted on this proposal');
         return;
       }
