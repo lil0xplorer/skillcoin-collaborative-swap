@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X } from 'lucide-react';
+import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X, Sun, Moon } from 'lucide-react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import WalletConnect from './components/WalletConnect';
@@ -21,6 +21,12 @@ function App() {
   const [proposals, setProposals] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'courses' | 'governance'>('courses');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
 
   const courses = [
     {
@@ -73,7 +79,6 @@ function App() {
 
       if (error) throw error;
 
-      // Combine approved courses with default courses
       const allCourses = [
         ...courses,
         ...(approvedCourses || []).map(course => ({
@@ -165,6 +170,15 @@ function App() {
     }
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  };
+
   const handleVote = async (proposalId: string, support: boolean) => {
     if (!signer) {
       toast.error('Please connect your wallet first');
@@ -172,68 +186,58 @@ function App() {
     }
 
     try {
-      const daoContract = new DAOContract(signer);
-      
-      // Ensure proposalId is a valid UUID
-      if (!proposalId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-        throw new Error('Invalid proposal ID format');
+      const { data: existingVote } = await supabase
+        .from('votes')
+        .select('*')
+        .eq('proposal_id', proposalId)
+        .eq('voter_address', await signer.getAddress())
+        .single();
+
+      if (existingVote) {
+        toast.error('You have already voted on this proposal');
+        return;
       }
 
-      // Get the proposal to check if voting is still open
-      const proposal = await daoContract.getProposal(1); // Use a fixed ID for now as we're using UUID in DB
-      const currentTime = Math.floor(Date.now() / 1000);
+      const daoContract = new DAOContract(signer);
       
-      if (currentTime > Number(proposal.endTime)) {
+      const currentTime = Math.floor(Date.now() / 1000);
+      const proposal = proposals.find(p => p.id === proposalId);
+      
+      if (!proposal) {
+        throw new Error('Invalid proposal ID');
+      }
+
+      if (new Date(proposal.end_time).getTime() < Date.now()) {
         throw new Error('Voting period has ended');
       }
 
-      // Attempt the blockchain transaction
-      const tx = await daoContract.vote(1, support); // Use a fixed ID for now
-      const receipt = await tx.wait();
-      
-      if (receipt.status === 1) { // Transaction successful
-        const voterAddress = await signer.getAddress();
-        
-        // Record the vote in the database
-        const { error: voteError } = await supabase
-          .from('votes')
-          .insert([{
-            proposal_id: proposalId,
-            voter_address: voterAddress,
-            support: support,
-          }]);
+      const { error: voteError } = await supabase
+        .from('votes')
+        .insert([{
+          proposal_id: proposalId,
+          voter_address: await signer.getAddress(),
+          support: support
+        }]);
 
-        if (voteError) {
-          console.error('Database error:', voteError);
-          toast.error('Vote recorded on blockchain, but database update failed');
-          return;
-        }
-
-        // Update vote counts using stored procedures
-        const { error: updateError } = await supabase.rpc(
-          support ? 'increment_yes_votes' : 'increment_no_votes',
-          { proposal_id: proposalId }
-        );
-
-        if (updateError) {
-          console.error('Error updating vote counts:', updateError);
-        }
-
-        await loadProposals(); // Refresh the proposals list
-        toast.success('Vote cast successfully!');
+      if (voteError) {
+        throw voteError;
       }
+
+      const { error: updateError } = await supabase.rpc(
+        support ? 'increment_yes_votes' : 'increment_no_votes',
+        { proposal_id: proposalId }
+      );
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      await loadProposals();
+      toast.success('Vote cast successfully!');
     } catch (error) {
       console.error('Error voting:', error);
       if (error instanceof Error) {
-        if (error.message.includes('Already voted')) {
-          toast.error('You have already voted on this proposal');
-        } else if (error.message.includes('Voting period ended')) {
-          toast.error('Voting period has ended');
-        } else if (error.message.includes('Invalid proposal')) {
-          toast.error('Invalid proposal ID');
-        } else {
-          toast.error(error.message);
-        }
+        toast.error(error.message);
       } else {
         toast.error('Failed to cast vote');
       }
@@ -267,22 +271,31 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <nav className="bg-white shadow-sm sticky top-0 z-10">
+    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
+      <nav className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm sticky top-0 z-10`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <GraduationCap size={32} className="text-indigo-600" />
-              <span className="text-xl font-bold text-gray-900">SkillShare DAO</span>
+              <span className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                SkillShare DAO
+              </span>
             </div>
             
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={toggleTheme}
+                className={`p-2 rounded-md ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} hover:bg-gray-100`}
+              >
+                {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+              </button>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
 
             <div className="hidden md:flex items-center gap-4">
               {walletAddress && (
@@ -304,7 +317,7 @@ function App() {
                 </>
               )}
               <div className="px-4 py-2 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">Balance</div>
+                <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Balance</div>
                 <div className="text-sm text-gray-600">
                   {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
                 </div>
@@ -319,9 +332,8 @@ function App() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className={`md:hidden border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
             <div className="px-4 py-3 space-y-3">
               {walletAddress && (
                 <>
@@ -347,8 +359,8 @@ function App() {
                   </button>
                 </>
               )}
-              <div className="px-4 py-2 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium text-gray-900">Balance</div>
+              <div className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
+                <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Balance</div>
                 <div className="text-sm text-gray-600">
                   {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
                 </div>
