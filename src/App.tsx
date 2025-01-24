@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X, Sun, Moon } from 'lucide-react';
+import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import WalletConnect from './components/WalletConnect';
@@ -27,6 +27,7 @@ function App() {
     }
     return false;
   });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const courses = [
     {
@@ -272,7 +273,8 @@ function App() {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
-      <nav className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm sticky top-0 z-10`}>
+      {/* Top Navigation - Only shows wallet connect and balance */}
+      <nav className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm sticky top-0 z-10 border-b`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
@@ -283,42 +285,9 @@ function App() {
             </div>
             
             <div className="flex items-center gap-4">
-              <button
-                onClick={toggleTheme}
-                className={`p-2 rounded-md ${isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'} hover:bg-gray-100`}
-              >
-                {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
-              </button>
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center gap-4">
-              {walletAddress && (
-                <>
-                  <button
-                    onClick={() => setShowCreateProposal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
-                  >
-                    <PlusCircle size={20} />
-                    Create Proposal
-                  </button>
-                  <button
-                    onClick={() => setShowDashboard(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
-                  >
-                    <LayoutDashboard size={20} />
-                    Dashboard
-                  </button>
-                </>
-              )}
-              <div className="px-4 py-2 bg-gray-50 rounded-lg">
+              <div className={`hidden md:block px-4 py-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
                 <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Balance</div>
-                <div className="text-sm text-gray-600">
+                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
                 </div>
               </div>
@@ -328,13 +297,27 @@ function App() {
                 isConnected={!!walletAddress}
                 connectedAddress={walletAddress}
               />
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className={`md:hidden border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
             <div className="px-4 py-3 space-y-3">
+              <button
+                onClick={toggleTheme}
+                className={`w-full flex items-center gap-2 px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg hover:bg-opacity-80 transition-colors`}
+              >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+              </button>
               {walletAddress && (
                 <>
                   <button
@@ -342,7 +325,7 @@ function App() {
                       setShowCreateProposal(true);
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-100 rounded-lg hover:bg-opacity-80 transition-colors"
                   >
                     <PlusCircle size={20} />
                     Create Proposal
@@ -352,114 +335,117 @@ function App() {
                       setShowDashboard(true);
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-100 rounded-lg hover:bg-opacity-80 transition-colors"
                   >
                     <LayoutDashboard size={20} />
                     Dashboard
                   </button>
                 </>
               )}
-              <div className={`px-4 py-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg`}>
-                <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>Balance</div>
-                <div className="text-sm text-gray-600">
-                  {balance ? `${parseFloat(balance).toFixed(4)} ETH` : '-'}
-                </div>
-              </div>
-              <div className="py-2">
-                <WalletConnect
-                  onConnect={handleWalletConnect}
-                  onDisconnect={handleWalletDisconnect}
-                  isConnected={!!walletAddress}
-                  connectedAddress={walletAddress}
-                />
-              </div>
             </div>
           </div>
         )}
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-center mb-8">
-          <div className="flex rounded-lg overflow-hidden border">
+      {/* Desktop Sidebar */}
+      <div className="flex">
+        <div className={`hidden md:block fixed inset-y-0 left-0 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-r shadow-lg pt-16`}>
+          <div className="w-64 p-4 space-y-4">
             <button
-              onClick={() => setActiveTab('courses')}
-              className={`px-6 py-2 text-sm font-medium ${
-                activeTab === 'courses'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+              onClick={toggleTheme}
+              className={`w-full flex items-center gap-2 px-4 py-2 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'} rounded-lg transition-colors`}
             >
-              Courses
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              {isDarkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
-            <button
-              onClick={() => setActiveTab('governance')}
-              className={`px-6 py-2 text-sm font-medium ${
-                activeTab === 'governance'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              Governance
-            </button>
+            {walletAddress && (
+              <>
+                <button
+                  onClick={() => setShowCreateProposal(true)}
+                  className="w-full flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-100 rounded-lg hover:bg-opacity-80 transition-colors"
+                >
+                  <PlusCircle size={20} />
+                  Create Proposal
+                </button>
+                <button
+                  onClick={() => setShowDashboard(true)}
+                  className="w-full flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-100 rounded-lg hover:bg-opacity-80 transition-colors"
+                >
+                  <LayoutDashboard size={20} />
+                  Dashboard
+                </button>
+              </>
+            )}
           </div>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={`absolute -right-3 top-1/2 transform -translate-y-1/2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-600'} border rounded-full p-1 shadow-lg`}
+          >
+            {isSidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
         </div>
 
-        {activeTab === 'courses' ? (
-          <>
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Learn, Teach, Earn
-              </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Join our decentralized learning community and earn tokens while sharing your knowledge.
-                All courses are verified by the DAO and backed by smart contracts.
-              </p>
-            </div>
+        {/* Main Content */}
+        <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {activeTab === 'courses' ? (
+              <>
+                <div className="text-center mb-12">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    Learn, Teach, Earn
+                  </h1>
+                  <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Join our decentralized learning community and earn tokens while sharing your knowledge.
+                    All courses are verified by the DAO and backed by smart contracts.
+                  </p>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {availableCourses.map((course, index) => (
-                <CourseCard
-                  key={index}
-                  {...course}
-                  onPurchase={() => handlePurchaseCourse(course)}
-                />
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Decentralized Governance
-              </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Participate in the future of our platform by creating and voting on proposals.
-                Your voice matters in shaping our collective decisions.
-              </p>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {availableCourses.map((course, index) => (
+                    <CourseCard
+                      key={index}
+                      {...course}
+                      onPurchase={() => handlePurchaseCourse(course)}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-12">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    Decentralized Governance
+                  </h1>
+                  <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Participate in the future of our platform by creating and voting on proposals.
+                    Your voice matters in shaping our collective decisions.
+                  </p>
+                </div>
 
-            <div className="grid gap-8">
-              {proposals.map((proposal) => (
-                <ProposalCard
-                  key={proposal.id}
-                  {...proposal}
-                  onVote={handleVote}
-                  onExecute={handleExecuteProposal}
-                />
-              ))}
-            </div>
+                <div className="grid gap-8">
+                  {proposals.map((proposal) => (
+                    <ProposalCard
+                      key={proposal.id}
+                      {...proposal}
+                      onVote={handleVote}
+                      onExecute={handleExecuteProposal}
+                    />
+                  ))}
+                </div>
 
-            {proposals.length === 0 && (
-              <div className="text-center py-12">
-                <Vote size={48} className="mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No proposals yet</h3>
-                <p className="text-gray-500">
-                  Be the first to create a proposal and start the governance process!
-                </p>
-              </div>
+                {proposals.length === 0 && (
+                  <div className="text-center py-12">
+                    <Vote size={48} className="mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">No proposals yet</h3>
+                    <p className="text-gray-500">
+                      Be the first to create a proposal and start the governance process!
+                    </p>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
 
       {showDashboard && (
