@@ -31,20 +31,7 @@ function App() {
 
   const courses = [
     {
-      title: "Web3 Development Fundamentals",
-      instructor: "Alex Thompson",
-      description: "Master blockchain development fundamentals, smart contracts, and Web3 technologies. Build real-world dApps and understand the core concepts of decentralized applications.",
-      price: "0.00005",
-      students: 156,
-      duration: "6 hours",
-      image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-      modules: [
-        { title: "Introduction to Web3", duration: "45 min", completed: false },
-        { title: "Blockchain Fundamentals", duration: "1 hour", completed: false },
-        { title: "Smart Contract Basics", duration: "1.5 hours", completed: false },
-        { title: "Building Your First dApp", duration: "2 hours", completed: false },
-        { title: "Web3 Security Best Practices", duration: "45 min", completed: false }
-      ]
+      
     },
     // ... (keep other course objects)
   ];
