@@ -257,7 +257,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
+    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
       {/* Top Navigation - Only shows wallet connect and balance */}
       <nav className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm sticky top-0 z-10 border-b`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -415,10 +415,10 @@ function App() {
             {activeTab === 'courses' ? (
               <>
                 <div className="text-center mb-12">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                  <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     Learn, Teach, Earn
                   </h1>
-                  <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  <p className={`text-xl max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Join our decentralized learning community and earn tokens while sharing your knowledge.
                     All courses are verified by the DAO and backed by smart contracts.
                   </p>
@@ -437,10 +437,10 @@ function App() {
             ) : (
               <>
                 <div className="text-center mb-12">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                  <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     Decentralized Governance
                   </h1>
-                  <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  <p className={`text-xl max-w-2xl mx-auto ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Participate in the future of our platform by creating and voting on proposals.
                     Your voice matters in shaping our collective decisions.
                   </p>
