@@ -14,7 +14,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({
   title,
-  instructor = 'Anonymous',
+  instructor,
   description,
   price,
   students,
@@ -57,57 +57,71 @@ const CourseCard: React.FC<CourseCardProps> = ({
     }
   };
 
+  const handleMintCertificate = () => {
+    window.location.href = 'https://www.google.com';
+  };
+
   return (
-    <div 
-      className="transform transition-all duration-500 bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:scale-[1.015] hover:brightness-110"
+    <div
+      className="course-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-2xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{
+        transform: isHovered ? 'translateY(-10px) rotateX(2deg)' : 'none',
+        transition: 'transform 0.3s ease-out',
+      }}
     >
+      <div className="relative overflow-hidden">
+        <img
+          src={image}
+          alt={title}
+          className="w-full h-48 object-cover transform transition-transform duration-700 hover:scale-110"
+        />
+        {purchased && (
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 bg-opacity-90 flex items-center justify-center backdrop-blur-sm">
+            <div className="text-white text-center transform transition-all duration-300 hover:scale-105">
+              <CheckCircle size={48} className="mx-auto mb-2 animate-pulse-slow" />
+              <p className="font-semibold text-xl">Course Purchased!</p>
+              <p className="text-sm opacity-90">Check your dashboard to start learning</p>
+            </div>
+          </div>
+        )}
+      </div>
       <div className="p-6">
-        <div className="relative overflow-hidden rounded-lg mb-4">
-          <img
-            src={image}
-            alt={title}
-            className="w-full h-64 object-cover transition-transform duration-700 hover:scale-110"
-          />
-        </div>
-        
         <div className="flex items-center gap-2 mb-2">
-          <BookOpen size={16} className="text-indigo-400" />
-          <span className="text-sm font-medium text-indigo-400">Course</span>
+          <BookOpen size={16} className="text-indigo-600" />
+          <span className="text-sm font-medium gradient-text">Course</span>
         </div>
-
-        <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-        
-        <p className="text-gray-400 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
+        <h3 className="text-xl font-semibold mb-2 text-gray-900 hover:gradient-text transition-colors duration-300">
+          {title}
+        </h3>
+        <p className="text-gray-600 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
           {description}
         </p>
-
-        <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 hover:text-indigo-400 transition-colors">
-              <Users size={16} />
-              <span>{students} students</span>
-            </div>
-            <div className="flex items-center gap-1 hover:text-indigo-400 transition-colors">
-              <Clock size={16} />
-              <span>{duration}</span>
-            </div>
+        
+        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+          <div className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
+            <Users size={16} />
+            <span>{students} students</span>
           </div>
-          <div className="text-pink-400 font-bold">
-            {price} ETH
+          <div className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
+            <Clock size={16} />
+            <span>{duration}</span>
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-4">
+        <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-center">
-                {instructor[0].toUpperCase()}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-center transform transition-transform hover:scale-110">
+                {instructor[0]}
               </div>
-              <span className="text-gray-400 hover:text-indigo-400 transition-colors">
+              <span className="text-sm text-gray-600 hover:text-indigo-600 transition-colors">
                 {instructor}
               </span>
+            </div>
+            <div className="text-indigo-600 font-semibold">
+              {price} ETH
             </div>
           </div>
 
@@ -119,12 +133,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <button
               onClick={handlePurchase}
               disabled={isPurchasing || purchased}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
+              className={`button-3d w-full py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
                 purchased
                   ? 'bg-green-500 text-white cursor-default'
                   : isPurchasing
                   ? 'bg-indigo-400 text-white cursor-wait'
-                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg hover:scale-105'
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-neon'
               }`}
             >
               {purchased
@@ -136,10 +150,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
             
             {purchased && (
               <button
-                onClick={() => window.location.href = 'https://www.google.com'}
-                className="w-full py-2 px-4 rounded-lg font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:scale-105 flex items-center justify-center gap-2"
+                onClick={handleMintCertificate}
+                className="button-3d w-full py-2 px-4 rounded-lg font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-neon flex items-center justify-center gap-2"
               >
-                <Award size={20} className="animate-bounce" />
+                <Award size={20} className="animate-float" />
                 Mint NFT Certificate
               </button>
             )}
