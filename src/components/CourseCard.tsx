@@ -58,13 +58,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
   };
 
   return (
-    <div className="nft transform transition-all duration-500 bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:scale-[1.015] hover:brightness-110">
-      <div className="main p-6">
-        <img
-          src={image}
-          alt={title}
-          className="tokenImage w-full h-64 object-cover rounded-lg mb-4 transition-transform duration-700 hover:scale-110"
-        />
+    <div 
+      className="transform transition-all duration-500 bg-gradient-to-b from-gray-800/50 to-gray-900/50 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:shadow-2xl hover:scale-[1.015] hover:brightness-110"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="p-6">
+        <div className="relative overflow-hidden rounded-lg mb-4">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-64 object-cover transition-transform duration-700 hover:scale-110"
+          />
+        </div>
         
         <div className="flex items-center gap-2 mb-2">
           <BookOpen size={16} className="text-indigo-400" />
@@ -73,11 +79,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
         <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
         
-        <p className="description text-gray-400 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
+        <p className="text-gray-400 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
           {description}
         </p>
 
-        <div className="tokenInfo flex items-center justify-between text-sm text-gray-400 mb-4">
+        <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 hover:text-indigo-400 transition-colors">
               <Users size={16} />
@@ -88,18 +94,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
               <span>{duration}</span>
             </div>
           </div>
-          <div className="price text-pink-400 font-bold">
+          <div className="text-pink-400 font-bold">
             {price} ETH
           </div>
         </div>
 
-        <div className="creator border-t border-white/10 pt-4">
+        <div className="border-t border-white/10 pt-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="wrapper">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-center">
-                  {instructor[0].toUpperCase()}
-                </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-center">
+                {instructor[0].toUpperCase()}
               </div>
               <span className="text-gray-400 hover:text-indigo-400 transition-colors">
                 {instructor}

@@ -286,8 +286,8 @@ function App() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className={`md:hidden p-2 rounded-md ${
                   isDarkMode 
-                    ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900'
                 } transition-colors`}
                 aria-label="Toggle menu"
               >
