@@ -30,7 +30,9 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const courses = [
-    
+    {
+      
+    },
     // ... (keep other course objects)
   ];
 
@@ -258,6 +260,7 @@ function App() {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
+      {/* Top Navigation - Only shows wallet connect and balance */}
       <nav className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm sticky top-0 z-10 border-b`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -283,7 +286,7 @@ function App() {
               />
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`md:hidden p-2 rounded-md hamburger-icon ${isDarkMode ? 'dark' : 'light'}`}
+                className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
