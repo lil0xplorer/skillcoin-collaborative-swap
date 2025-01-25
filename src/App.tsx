@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gem, Vote, PlusCircle, LayoutDashboard, Menu, X, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GraduationCap, Vote, PlusCircle, LayoutDashboard, Menu, X, Sun, Moon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import WalletConnect from './components/WalletConnect';
@@ -258,11 +258,12 @@ function App() {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
+      {/* Top Navigation - Only shows wallet connect and balance */}
       <nav className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} shadow-sm sticky top-0 z-10 border-b`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <Gem size={32} className="text-indigo-600" />
+              <GraduationCap size={32} className="text-indigo-600" />
               <span className={`text-xl font-bold font-lexend ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Antec
               </span>
@@ -285,8 +286,8 @@ function App() {
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className={`md:hidden p-2 rounded-md ${
                   isDarkMode 
-                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900'
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
                 } transition-colors`}
                 aria-label="Toggle menu"
               >
