@@ -82,9 +82,9 @@ html {
 }
 
 .dark .hamburger-icon {
-  @apply text-gray-200 hover:text-white hover:bg-gray-700;
+  @apply bg-gray-700 text-gray-200 hover:bg-gray-600 hover:text-white;
 }
 
 .light .hamburger-icon {
-  @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100;
+  @apply bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900;
 }
