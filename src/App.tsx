@@ -30,9 +30,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const courses = [
-    {
-      
-    },
+    
     // ... (keep other course objects)
   ];
 
