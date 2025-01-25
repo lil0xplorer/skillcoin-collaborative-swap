@@ -75,3 +75,16 @@ html {
     background-position: 0% 50%;
   }
 }
+
+/* Hamburger menu styles */
+.hamburger-icon {
+  @apply transition-colors duration-200;
+}
+
+.dark .hamburger-icon {
+  @apply text-gray-200 hover:text-white hover:bg-gray-700;
+}
+
+.light .hamburger-icon {
+  @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100;
+}

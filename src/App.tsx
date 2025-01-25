@@ -264,8 +264,8 @@ function App() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <GraduationCap size={32} className="text-indigo-600" />
-              <span className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                SkillShare DAO
+              <span className={`text-xl font-bold font-lexend ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Antec
               </span>
             </div>
             
@@ -284,7 +284,12 @@ function App() {
               />
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700"
+                className={`md:hidden p-2 rounded-md ${
+                  isDarkMode 
+                    ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-200'
+                } transition-colors`}
+                aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
