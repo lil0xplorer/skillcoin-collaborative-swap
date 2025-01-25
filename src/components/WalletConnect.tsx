@@ -107,14 +107,36 @@ const WalletConnect: React.FC<WalletConnectProps> = ({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <button
-        onClick={connectWallet}
-        disabled={connecting}
-        className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-all transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:transform-none"
-      >
-        <Wallet size={20} />
-        {connecting ? 'Connecting...' : 'Connect MetaMask'}
-      </button>
+      <div className="buttons">
+        <button
+          onClick={connectWallet}
+          disabled={connecting}
+          className="blob-btn"
+        >
+          <span className="blob-btn__inner">
+            <span className="blob-btn__blobs">
+              <span className="blob-btn__blob"></span>
+              <span className="blob-btn__blob"></span>
+              <span className="blob-btn__blob"></span>
+              <span className="blob-btn__blob"></span>
+              <span className="flex items-center justify-center gap-2">
+                <Wallet size={20} />
+                <span className="hidden md:inline">Connect MetaMask</span>
+                <span className="md:hidden">Connect</span>
+              </span>
+            </span>
+          </span>
+        </button>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" className="hidden">
+          <defs>
+            <filter id="goo">
+              <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10"></feGaussianBlur>
+              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 21 -7" result="goo"></feColorMatrix>
+              <feBlend in2="goo" in="SourceGraphic" result="mix"></feBlend>
+            </filter>
+          </defs>
+        </svg>
+      </div>
       {error && (
         <p className="text-red-500 text-sm">{error}</p>
       )}
