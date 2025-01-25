@@ -14,7 +14,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({
   title,
-  instructor,
+  instructor = 'Anonymous', // Add default value
   description,
   price,
   students,
@@ -61,9 +61,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
     window.location.href = 'https://www.google.com';
   };
 
+  // Get instructor initial safely
+  const instructorInitial = instructor && instructor.length > 0 ? instructor[0].toUpperCase() : 'A';
+
   return (
     <div
-      className="course-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-2xl"
+      className="course-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-500 hover:shadow-2xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -92,14 +95,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <BookOpen size={16} className="text-indigo-600" />
           <span className="text-sm font-medium gradient-text">Course</span>
         </div>
-        <h3 className="text-xl font-semibold mb-2 text-gray-900 hover:gradient-text transition-colors duration-300">
+        <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white hover:gradient-text transition-colors duration-300">
           {title}
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
+        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2 hover:line-clamp-none transition-all duration-300">
           {description}
         </p>
         
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
           <div className="flex items-center gap-1 hover:text-indigo-600 transition-colors">
             <Users size={16} />
             <span>{students} students</span>
@@ -110,23 +113,23 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </div>
         </div>
 
-        <div className="border-t pt-4">
+        <div className="border-t dark:border-gray-700 pt-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white flex items-center justify-center transform transition-transform hover:scale-110">
-                {instructor[0]}
+                {instructorInitial}
               </div>
-              <span className="text-sm text-gray-600 hover:text-indigo-600 transition-colors">
+              <span className="text-sm text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                 {instructor}
               </span>
             </div>
-            <div className="text-indigo-600 font-semibold">
+            <div className="text-indigo-600 dark:text-indigo-400 font-semibold">
               {price} ETH
             </div>
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm mb-4 animate-pulse">{error}</p>
+            <p className="text-red-500 dark:text-red-400 text-sm mb-4 animate-pulse">{error}</p>
           )}
 
           <div className="flex flex-col gap-2">
@@ -135,9 +138,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
               disabled={isPurchasing || purchased}
               className={`button-3d w-full py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
                 purchased
-                  ? 'bg-green-500 text-white cursor-default'
+                  ? 'bg-green-500 text-white cursor-default dark:bg-green-600'
                   : isPurchasing
-                  ? 'bg-indigo-400 text-white cursor-wait'
+                  ? 'bg-indigo-400 text-white cursor-wait dark:bg-indigo-500'
                   : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-neon'
               }`}
             >
