@@ -7,6 +7,7 @@ import CourseCard from './components/CourseCard';
 import Dashboard from './components/Dashboard';
 import ProposalCard from './components/ProposalCard';
 import CreateProposal from './components/CreateProposal';
+import CreateCourse from './components/CreateCourse';
 import { supabase, retryOperation } from './lib/supabase';
 import { DAOContract } from './contracts/DAOContract';
 
@@ -16,6 +17,7 @@ function App() {
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showCreateProposal, setShowCreateProposal] = useState(false);
+  const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [purchasedCourses, setPurchasedCourses] = useState<any[]>([]);
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
   const [proposals, setProposals] = useState<any[]>([]);
@@ -23,11 +25,9 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      // Get from localStorage or default to true (dark mode)
       const savedMode = localStorage.getItem('darkMode');
       const isDark = savedMode !== null ? savedMode === 'true' : true;
       
-      // Set initial dark mode class
       if (isDark) {
         document.documentElement.classList.add('dark');
       } else {
@@ -36,13 +36,12 @@ function App() {
       
       return isDark;
     }
-    return true; // Default to dark mode
+    return true;
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSubmittingProposal, setIsSubmittingProposal] = useState(false);
 
   const generateRating = () => {
-    // Generate a random rating between 4.0 and 5.0
     return (4 + Math.random()).toFixed(1);
   };
 
@@ -77,7 +76,6 @@ function App() {
 
       if (error) throw error;
 
-      // Only use the courses from Supabase
       const allCourses = (approvedCourses || []).map(course => ({
         ...course,
         price: course.price || '0.00005',
@@ -91,7 +89,6 @@ function App() {
         ],
         rating: generateRating(),
         reviews: Math.floor(Math.random() * 500 + 100),
-        // Add default category if none exists
         category: course.category || determineCategory(course.title)
       }));
 
@@ -288,10 +285,8 @@ function App() {
       setIsSubmittingProposal(true);
       const daoContract = new DAOContract(signer);
       
-      // Show loading toast
       toast.loading('Creating proposal...');
       
-      // Create the proposal with the fee
       const tx = await daoContract.createProposal(
         proposalData.title,
         proposalData.description,
@@ -299,12 +294,10 @@ function App() {
         { value: ethers.parseEther("0.01") }
       );
 
-      // Wait for transaction confirmation
       if (tx && tx.hash) {
         const receipt = await signer.provider?.waitForTransaction(tx.hash);
         
         if (receipt) {
-          // After blockchain transaction is confirmed, save to Supabase
           const endTime = new Date();
           endTime.setDate(endTime.getDate() + proposalData.durationInDays);
 
@@ -320,17 +313,16 @@ function App() {
 
           if (error) throw error;
           
-          // Update the UI
           await loadProposals();
           setShowCreateProposal(false);
-          toast.dismiss(); // Dismiss loading toast
+          toast.dismiss();
           toast.success('Proposal created successfully! Fee paid: 0.01 Sepolia ETH');
         }
       }
       
     } catch (error: any) {
       console.error('Error creating proposal:', error);
-      toast.dismiss(); // Dismiss loading toast
+      toast.dismiss();
       if (error.message.includes('insufficient funds')) {
         toast.error('Insufficient Sepolia ETH. You need 0.01 ETH to create a proposal');
       } else {
@@ -341,7 +333,6 @@ function App() {
     }
   };
 
-  // Add helper function to determine category from title
   const determineCategory = (title: string): CourseCategory => {
     title = title.toLowerCase();
     if (title.includes('crypto') || title.includes('defi')) return 'crypto';
@@ -351,10 +342,9 @@ function App() {
     if (title.includes('marketing') || title.includes('business')) return 'business';
     if (title.includes('dao') || title.includes('governance')) return 'dao';
     if (title.includes('zero knowledge') || title.includes('zk')) return 'zk';
-    return 'web3'; // default category
+    return 'web3';
   };
 
-  // Add this new particle component with more dynamic animations
   const ParticleEffect = ({ index }: { index: number }) => {
     const randomSize = Math.random() * 3 + 1;
     const randomDelay = Math.random() * 5;
@@ -377,25 +367,18 @@ function App() {
 
   return (
     <div className={`min-h-screen relative ${isDarkMode ? 'dark bg-[#121212]' : 'bg-gradient-to-b from-gray-50 to-gray-100'}`}>
-      {/* Animated Background Container - Now covers entire screen including header */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Primary animated gradient background */}
         <div className="absolute inset-0">
-          {/* Main purple gradient with slower animation */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-violet-500/20 to-fuchsia-500/30 animate-gradient-slow blur-3xl" />
-          
-          {/* Secondary gradients */}
           <div className="absolute inset-0 bg-gradient-to-tl from-blue-500/20 via-indigo-500/20 to-cyan-500/20 animate-gradient-xy blur-3xl" />
         </div>
 
-        {/* Floating orbs with adjusted colors */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-violet-600/30 dark:bg-violet-500/40 rounded-full mix-blend-multiply filter blur-3xl animate-float-slow" />
           <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-600/30 dark:bg-purple-500/40 rounded-full mix-blend-multiply filter blur-3xl animate-float-delay" />
           <div className="absolute bottom-1/4 left-1/3 w-[600px] h-[600px] bg-fuchsia-600/30 dark:bg-fuchsia-500/40 rounded-full mix-blend-multiply filter blur-3xl animate-float" />
         </div>
 
-        {/* Animated particles */}
         <div className="absolute inset-0">
           {[...Array(50)].map((_, i) => (
             <div
@@ -415,15 +398,12 @@ function App() {
           ))}
         </div>
 
-        {/* Light overlay for better contrast */}
         <div className={`absolute inset-0 ${
           isDarkMode ? 'bg-[#121212]/60' : 'bg-white/30'
         } backdrop-blur-[1px]`} />
       </div>
 
-      {/* Content container - Update z-index to be above background */}
       <div className="relative z-20">
-        {/* Update nav background to be transparent */}
         <nav className={`${
           isDarkMode 
             ? 'border-gray-800 bg-[#121212]/70' 
@@ -481,7 +461,6 @@ function App() {
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className={`md:hidden border-t ${isDarkMode ? 'border-gray-800 bg-[#121212]' : 'border-gray-200 bg-white'}`}>
               <div className="px-4 py-3 space-y-3">
@@ -498,6 +477,17 @@ function App() {
                 </button>
                 {walletAddress && (
                   <>
+                    <button
+                      onClick={() => setShowCreateCourse(true)}
+                      className={`w-full flex items-center gap-2 px-4 py-2 ${
+                        isDarkMode 
+                          ? 'bg-[#1E1E1E] text-gray-300 hover:bg-[#2A2A2A]' 
+                          : 'bg-purple-100 text-purple-700'
+                      } rounded-lg hover:bg-opacity-80 transition-colors`}
+                    >
+                      <PlusCircle size={20} />
+                      Create Course
+                    </button>
                     <button
                       onClick={() => {
                         setShowCreateProposal(true);
@@ -533,7 +523,6 @@ function App() {
           )}
         </nav>
 
-        {/* Desktop Sidebar */}
         <div className="flex">
           <div className={`hidden md:block fixed inset-y-0 left-0 transform ${
             isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -554,6 +543,17 @@ function App() {
               </button>
               {walletAddress && (
                 <>
+                  <button
+                    onClick={() => setShowCreateCourse(true)}
+                    className={`w-full flex items-center gap-2 px-4 py-2 ${
+                      isDarkMode 
+                        ? 'bg-[#1E1E1E] text-gray-300 hover:bg-[#2A2A2A]' 
+                        : 'bg-purple-100 text-purple-700'
+                    } rounded-lg hover:bg-opacity-80 transition-colors`}
+                  >
+                    <PlusCircle size={20} />
+                    Create Course
+                  </button>
                   <button
                     onClick={() => setShowCreateProposal(true)}
                     className={`w-full flex items-center gap-2 px-4 py-2 ${
@@ -591,10 +591,8 @@ function App() {
             </button>
           </div>
 
-          {/* Main Content */}
           <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-0'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {/* Add Tab Switcher */}
               <div className="flex justify-center mb-8">
                 <div className={`inline-flex rounded-lg p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
                   <button
@@ -703,6 +701,13 @@ function App() {
             isSubmitting={isSubmittingProposal}
             requiredFee="0.01"
             signer={signer}
+          />
+        )}
+
+        {showCreateCourse && walletAddress && (
+          <CreateCourse
+            onClose={() => setShowCreateCourse(false)}
+            walletAddress={walletAddress}
           />
         )}
       </div>
