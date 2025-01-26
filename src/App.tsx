@@ -105,12 +105,18 @@ function App() {
 
   const loadProposals = async () => {
     try {
+      console.log('Fetching proposals...');
       const { data, error } = await supabase
         .from('proposals')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Proposals fetched:', data);
       setProposals(data || []);
     } catch (error) {
       console.error('Error loading proposals:', error);
