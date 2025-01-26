@@ -23,7 +23,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
   });
 
   const categories: CourseCategory[] = ['crypto', 'ai', 'creative', 'web3', 'business', 'dao', 'zk'];
-  const SEPOLIA_ADDRESS = "0x702160806DE650831eDc2731e128f17feE1E897e";
+  const SEPOLIA_ADDRESS = "0xb381e264D4e2501b8f7e46759461eAf78335f1cF";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
