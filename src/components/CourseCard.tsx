@@ -40,51 +40,51 @@ const getCategoryColors = (category: CourseCardProps['category'], isDarkMode: bo
       };
     case 'creative':
       return {
-        bg: isDarkMode ? 'bg-amber-900/30' : 'bg-amber-50',
-        border: isDarkMode ? 'border-amber-500/30' : 'border-amber-200',
-        text: isDarkMode ? 'text-amber-400' : 'text-amber-700',
-        hover: isDarkMode ? 'hover:bg-amber-800/40' : 'hover:bg-amber-100',
-        glow: isDarkMode ? 'shadow-amber-500/20' : ''
+        bg: isDarkMode ? 'bg-orange-900/30' : 'bg-orange-50',
+        border: isDarkMode ? 'border-orange-500/30' : 'border-orange-200',
+        text: isDarkMode ? 'text-orange-400' : 'text-orange-700',
+        hover: isDarkMode ? 'hover:bg-orange-800/40' : 'hover:bg-orange-100',
+        glow: isDarkMode ? 'shadow-orange-500/20' : ''
       };
     case 'web3':
-      return {
-        bg: isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50',
-        border: isDarkMode ? 'border-blue-500/30' : 'border-blue-200',
-        text: isDarkMode ? 'text-blue-400' : 'text-blue-700',
-        hover: isDarkMode ? 'hover:bg-blue-800/40' : 'hover:bg-blue-100',
-        glow: isDarkMode ? 'shadow-blue-500/20' : ''
-      };
-    case 'business':
-      return {
-        bg: isDarkMode ? 'bg-rose-900/30' : 'bg-rose-50',
-        border: isDarkMode ? 'border-rose-500/30' : 'border-rose-200',
-        text: isDarkMode ? 'text-rose-400' : 'text-rose-700',
-        hover: isDarkMode ? 'hover:bg-rose-800/40' : 'hover:bg-rose-100',
-        glow: isDarkMode ? 'shadow-rose-500/20' : ''
-      };
-    case 'dao':
-      return {
-        bg: isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-50',
-        border: isDarkMode ? 'border-yellow-500/30' : 'border-yellow-200',
-        text: isDarkMode ? 'text-yellow-400' : 'text-yellow-700',
-        hover: isDarkMode ? 'hover:bg-yellow-800/40' : 'hover:bg-yellow-100',
-        glow: isDarkMode ? 'shadow-yellow-500/20' : ''
-      };
-    case 'zk':
-      return {
-        bg: isDarkMode ? 'bg-green-900/30' : 'bg-green-50',
-        border: isDarkMode ? 'border-green-500/30' : 'border-green-200',
-        text: isDarkMode ? 'text-green-400' : 'text-green-700',
-        hover: isDarkMode ? 'hover:bg-green-800/40' : 'hover:bg-green-100',
-        glow: isDarkMode ? 'shadow-green-500/20' : ''
-      };
-    default:
       return {
         bg: isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50',
         border: isDarkMode ? 'border-purple-500/30' : 'border-purple-200',
         text: isDarkMode ? 'text-purple-400' : 'text-purple-700',
         hover: isDarkMode ? 'hover:bg-purple-800/40' : 'hover:bg-purple-100',
         glow: isDarkMode ? 'shadow-purple-500/20' : ''
+      };
+    case 'business':
+      return {
+        bg: isDarkMode ? 'bg-pink-900/30' : 'bg-pink-50',
+        border: isDarkMode ? 'border-pink-500/30' : 'border-pink-200',
+        text: isDarkMode ? 'text-pink-400' : 'text-pink-700',
+        hover: isDarkMode ? 'hover:bg-pink-800/40' : 'hover:bg-pink-100',
+        glow: isDarkMode ? 'shadow-pink-500/20' : ''
+      };
+    case 'dao':
+      return {
+        bg: isDarkMode ? 'bg-amber-900/30' : 'bg-amber-50',
+        border: isDarkMode ? 'border-amber-500/30' : 'border-amber-200',
+        text: isDarkMode ? 'text-amber-400' : 'text-amber-700',
+        hover: isDarkMode ? 'hover:bg-amber-800/40' : 'hover:bg-amber-100',
+        glow: isDarkMode ? 'shadow-amber-500/20' : ''
+      };
+    case 'zk':
+      return {
+        bg: isDarkMode ? 'bg-lime-900/30' : 'bg-lime-50',
+        border: isDarkMode ? 'border-lime-500/30' : 'border-lime-200',
+        text: isDarkMode ? 'text-lime-400' : 'text-lime-700',
+        hover: isDarkMode ? 'hover:bg-lime-800/40' : 'hover:bg-lime-100',
+        glow: isDarkMode ? 'shadow-lime-500/20' : ''
+      };
+    default:
+      return {
+        bg: isDarkMode ? 'bg-teal-900/30' : 'bg-teal-50',
+        border: isDarkMode ? 'border-teal-500/30' : 'border-teal-200',
+        text: isDarkMode ? 'text-teal-400' : 'text-teal-700',
+        hover: isDarkMode ? 'hover:bg-teal-800/40' : 'hover:bg-teal-100',
+        glow: isDarkMode ? 'shadow-teal-500/20' : ''
       };
   }
 };
