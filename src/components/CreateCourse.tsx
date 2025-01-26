@@ -23,6 +23,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
   });
 
   const categories: CourseCategory[] = ['crypto', 'ai', 'creative', 'web3', 'business', 'dao', 'zk'];
+  const SEPOLIA_ADDRESS = "0x702160806DE650831eDc2731e128f17feE1E897e";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +42,7 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
       toast.loading('Processing payment...');
       
       const tx = await signer.sendTransaction({
-        to: "0x702160806DE650831eDc2731e128f17feE1E897e",
+        to: SEPOLIA_ADDRESS,
         value: ethers.parseEther("0.02")
       });
 
@@ -64,10 +65,9 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
       if (error) throw error;
       
       toast.dismiss();
-      toast.success('Course created successfully! Fee paid: 0.02 Sepolia ETH');
+      toast.success('Course submitted successfully! Your course will be reviewed by our team before being published. You will be notified once it is approved.');
       onClose();
       
-      // Trigger a refresh of the courses list
       window.dispatchEvent(new Event('courseCreated'));
       
     } catch (error: any) {
@@ -97,6 +97,14 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
             >
               <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
+          </div>
+
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Payment Address: <span className="font-mono">{SEPOLIA_ADDRESS}</span>
+              <br />
+              Fee: 0.02 Sepolia ETH
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
