@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
+import { CourseCategory } from '../types/course';
 
 interface CreateCourseProps {
   onClose: () => void;
@@ -17,8 +18,11 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
     image: '',
     instructor: '',
     duration: '',
-    price: '0.00005'
+    price: '0.00005',
+    category: 'web3' as CourseCategory
   });
+
+  const categories: CourseCategory[] = ['crypto', 'ai', 'creative', 'web3', 'business', 'dao', 'zk'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,23 +35,18 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
     try {
       setIsSubmitting(true);
       
-      // Request payment of 0.02 Sepolia ETH
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       
-      // Show loading toast
       toast.loading('Processing payment...');
       
-      // Send transaction
       const tx = await signer.sendTransaction({
-        to: "0x702160806DE650831eDc2731e128f17feE1E897e", // DAO contract address
+        to: "0x702160806DE650831eDc2731e128f17feE1E897e",
         value: ethers.parseEther("0.02")
       });
 
-      // Wait for transaction confirmation
       await tx.wait();
       
-      // After payment confirmation, save to Supabase
       const { error } = await supabase
         .from('courses')
         .insert({
@@ -58,17 +57,22 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
           duration: formData.duration,
           price: formData.price,
           wallet_address: walletAddress,
-          status: 'pending'
+          status: 'pending',
+          category: formData.category
         });
 
       if (error) throw error;
       
-      toast.dismiss(); // Dismiss loading toast
+      toast.dismiss();
       toast.success('Course created successfully! Fee paid: 0.02 Sepolia ETH');
       onClose();
+      
+      // Trigger a refresh of the courses list
+      window.dispatchEvent(new Event('courseCreated'));
+      
     } catch (error: any) {
       console.error('Error creating course:', error);
-      toast.dismiss(); // Dismiss loading toast
+      toast.dismiss();
       if (error.message.includes('insufficient funds')) {
         toast.error('Insufficient Sepolia ETH. You need 0.02 ETH to create a course');
       } else {
@@ -107,6 +111,24 @@ const CreateCourse: React.FC<CreateCourseProps> = ({ onClose, walletAddress }) =
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Category
+              </label>
+              <select
+                required
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value as CourseCategory })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category.toUpperCase()}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

@@ -10,6 +10,7 @@ import CreateProposal from './components/CreateProposal';
 import CreateCourse from './components/CreateCourse';
 import { supabase, retryOperation } from './lib/supabase';
 import { DAOContract } from './contracts/DAOContract';
+import { CourseCategory } from './types/course';
 
 function App() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
@@ -48,6 +49,15 @@ function App() {
   useEffect(() => {
     loadCourses();
     loadProposals();
+    
+    const handleCourseCreated = () => {
+      loadCourses();
+    };
+
+    window.addEventListener('courseCreated', handleCourseCreated);
+    return () => {
+      window.removeEventListener('courseCreated', handleCourseCreated);
+    };
   }, []);
 
   useEffect(() => {
