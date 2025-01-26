@@ -485,6 +485,19 @@ function App() {
                   {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                   {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                 </button>
+                
+                <button
+                  onClick={() => window.location.href = 'https://www.google.com'}
+                  className={`w-full flex items-center gap-2 px-4 py-2 ${
+                    isDarkMode 
+                      ? 'bg-gradient-to-r from-purple-600/80 to-indigo-600/80 text-white hover:from-purple-500/90 hover:to-indigo-500/90' 
+                      : 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600'
+                  } rounded-lg transition-all duration-300 shadow-md hover:shadow-lg`}
+                >
+                  <GraduationCap size={20} />
+                  Get Any NFT Certificate
+                </button>
+
                 {walletAddress && (
                   <>
                     <button
